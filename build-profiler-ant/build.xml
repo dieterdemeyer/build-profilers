@@ -1,0 +1,90 @@
+<project name="money_demo" default="code.compile" basedir=".">
+    <description>
+        money build file
+    </description>
+
+    <property name="src" location="src/main/java"/>
+    <property name="test.src" location="src/test/java"/>
+    <property name="app.build" location="build/app"/>
+    <property name="resources.dir" location="src/main/resources"/>
+    <property name="test.build" location="build/test"/>
+    <property name="test.result" location="build/testresult"/>
+
+    
+    <path id="build.classpath">
+        <fileset dir="lib"/>
+        <fileset dir="${user.home}/.m2/repository/com/google/code/gson/gson/1.4/">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${user.home}/.m2/repository/com/google/collections/google-collections/1.0/">
+            <include name="**/*.jar"/>
+        </fileset>
+        <fileset dir="${user.home}/.m2/repository/org/freemarker/">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement path="${app.build}"/>
+    </path>
+
+    <path id="testbuild.classpath">
+        <path refid="build.classpath"/>
+        <pathelement path="${test.build}"/>
+        <pathelement location="${resources.dir}"/>
+        <fileset dir="${user.home}/.m2/repository/junit/junit/4.6/">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="code.compile"
+            description="Creates ${app.build} directory and compiles sources from ${src} to ${app.build}">
+        <mkdir dir="${app.build}"/>
+        <javac srcdir="${src}" destdir="${app.build}" classpathref="build.classpath" source="1.5" debug="true"/>
+    </target>
+
+    <target name="test.compile" depends="code.compile"
+            description="Creates ${test.build} directory and compiles sources from ${test.src} to ${test.build}">
+        <mkdir dir="${test.build}"/>
+        <javac srcdir="${test.src}"
+               destdir="${test.build}"
+               classpathref="testbuild.classpath" source="1.5"/>
+    </target>
+
+    <target name="test.run" depends="test.compile" description="Runs the tests">
+        <mkdir dir="${test.result}"/>
+        <junit fork="yes" printsummary="true" showoutput="true">
+            <classpath refid="testbuild.classpath"/>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${test.result}">
+                <fileset dir="${test.src}" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+    </target>
+
+
+    <target  name="jar" depends="code.compile">
+        
+        <property name="m2repo" value="${user.home}/.m2/repository/"/>
+        <jar jarfile="biatch.jar">
+            <zipfileset src="${m2repo}/com/google/collections/google-collections/1.0/google-collections-1.0.jar"/>
+            <zipfileset src="${m2repo}/com/google/code/gson/gson/1.4/gson-1.4.jar"/>
+            <zipfileset src="${m2repo}/org/freemarker/freemarker/2.3.14/freemarker-2.3.14.jar"/>
+            <fileset dir="${app.build}"/>
+            <fileset dir="${resources.dir}"/>
+        </jar>
+        <copy todir="${user.home}" file="biatch.jar"/>
+
+    </target>
+
+    <target name="run" depends="jar">
+        <exec executable="/usr/bin/ant" dir="${basedir}">
+            <arg line=" -lib biatch.jar -listener be.dieterdemeyer.build.ant.LogListener test.run"/>
+        </exec>
+    </target>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+
+
+
+</project>

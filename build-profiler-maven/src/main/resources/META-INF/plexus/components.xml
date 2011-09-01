@@ -1,0 +1,24 @@
+<component-set>
+  <components>
+
+    <component>
+      <role>org.apache.maven.Maven</role>
+      <implementation>be.dieterdemeyer.build.maven.BProfMavenWrapper</implementation>
+      <requirements>
+        <requirement>
+          <role>org.apache.maven.project.MavenProjectBuilder</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.lifecycle.LifecycleExecutor</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.usability.diagnostics.ErrorDiagnostics</role>
+        </requirement>
+        <requirement>
+          <role>org.apache.maven.execution.RuntimeInformation</role>
+        </requirement>
+      </requirements>
+    </component>
+
+  </components>
+</component-set>
